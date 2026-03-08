@@ -112,6 +112,13 @@ public:
 
     sk_sp<SkTypeface> legacyMakeTypeface(const char familyName[], SkFontStyle style) const;
 
+    /** Return the default fontmgr. */
+    static sk_sp<SkFontMgr> RefDefault();
+
+    /** Construct a new instance of the fontmgr. */
+    static sk_sp<SkFontMgr> MakeDefault() { return SkFontMgr::Factory(); }
+
+
     /* Returns an empty font manager without any typeface dependencies */
     static sk_sp<SkFontMgr> RefEmpty();
 

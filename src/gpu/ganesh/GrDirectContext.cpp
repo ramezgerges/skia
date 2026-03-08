@@ -1183,6 +1183,64 @@ sk_sp<GrDirectContext> GrDirectContext::MakeMock(const GrMockOptions* mockOption
     return direct;
 }
 
+#ifdef SK_VULKAN
+/*************************************************************************************************/
+sk_sp<GrDirectContext> GrDirectContext::MakeVulkan(const GrVkBackendContext& backendContext) {
+    GrContextOptions defaultOptions;
+    return MakeVulkan(backendContext, defaultOptions);
+}
+
+sk_sp<GrDirectContext> GrDirectContext::MakeVulkan(const GrVkBackendContext& backendContext,
+                                                   const GrContextOptions& options) {
+    sk_sp<GrDirectContext> direct(new GrDirectContext(GrBackendApi::kVulkan, options));
+
+    direct->fGpu = GrVkGpu::Make(backendContext, options, direct.get());
+    if (!direct->init()) {
+        return nullptr;
+    }
+
+    return direct;
+}
+#endif
+
+#ifdef SK_METAL
+/*************************************************************************************************/
+sk_sp<GrDirectContext> GrDirectContext::MakeMetal(const GrMtlBackendContext& backendContext) {
+    GrContextOptions defaultOptions;
+    return MakeMetal(backendContext, defaultOptions);
+}
+
+sk_sp<GrDirectContext> GrDirectContext::MakeMetal(const GrMtlBackendContext& backendContext,
+                                                     const GrContextOptions& options) {
+    sk_sp<GrDirectContext> direct(new GrDirectContext(GrBackendApi::kMetal, options));
+
+    direct->fGpu = GrMtlTrampoline::MakeGpu(backendContext, options, direct.get());
+    if (!direct->init()) {
+        return nullptr;
+    }
+
+    return direct;
+}
+
+// deprecated
+sk_sp<GrDirectContext> GrDirectContext::MakeMetal(void* device, void* queue) {
+    GrContextOptions defaultOptions;
+    return MakeMetal(device, queue, defaultOptions);
+}
+
+// deprecated
+// remove include/gpu/mtl/GrMtlBackendContext.h, above, when removed
+sk_sp<GrDirectContext> GrDirectContext::MakeMetal(void* device, void* queue,
+                                                  const GrContextOptions& options) {
+    GrMtlBackendContext backendContext = {};
+    backendContext.fDevice.retain(device);
+    backendContext.fQueue.retain(queue);
+
+    return GrDirectContext::MakeMetal(backendContext, options);
+}
+#endif
+
+
 #ifdef SK_DIRECT3D
 /*************************************************************************************************/
 sk_sp<GrDirectContext> GrDirectContext::MakeDirect3D(const GrD3DBackendContext& backendContext) {

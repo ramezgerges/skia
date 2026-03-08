@@ -8,21 +8,11 @@
 #include "include/gpu/ganesh/gl/GrGLAssembleInterface.h"
 #include "include/gpu/ganesh/gl/GrGLInterface.h"
 
-#include <GLES3/gl32.h>
+#include "emscripten/html5.h"
 
 static GrGLFuncPtr webgl_get_gl_proc(void* ctx, const char name[]) {
-
-    #define M(X) if (0 == strcmp(#X, name)) { return (GrGLFuncPtr) X; }
-    M(glGetString)
-    #undef M
-
-    // We explicitly do not use GetProcAddress or something similar because
-    // its code size is quite large. We shouldn't need GetProcAddress
-    // because emscripten provides us all the valid function pointers
-    // for WebGL via the included headers.
-    // https://github.com/emscripten-core/emscripten/blob/7ba7700902c46734987585409502f3c63beb650f/system/include/emscripten/html5_webgl.h#L93
-    SkASSERTF(false, "Can't lookup fn %s\n", name);
-    return nullptr;
+    SkASSERT(nullptr == ctx);
+    return (GrGLFuncPtr) emscripten_webgl_get_proc_address(name);
 }
 
 namespace GrGLInterfaces {

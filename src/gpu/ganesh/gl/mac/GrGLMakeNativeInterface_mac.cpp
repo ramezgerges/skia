@@ -13,15 +13,70 @@
 #include "include/private/base/SkTemplates.h"
 
 #include <dlfcn.h>
-#include <memory>
+
+typedef void* (*CGLGetCurrentContextProc)(void);
+
+class GLLoader {
+public:
+    GLLoader() {
+        fLibrary = dlopen(
+                    "/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib",
+                    RTLD_LAZY);
+    }
+
+    ~GLLoader() {
+        if (fLibrary) {
+            dlclose(fLibrary);
+        }
+    }
+
+    void* handle() const {
+        return nullptr == fLibrary ? RTLD_DEFAULT : fLibrary;
+    }
+
+private:
+    void* fLibrary;
+};
+
+class GLProcGetter {
+public:
+    GLProcGetter() {
+        fGetCurrentContext = (CGLGetCurrentContextProc)getProc("CGLGetCurrentContext");
+    }
+
+    bool isInitialized() const {
+        return SkToBool(fLoader.handle() && fGetCurrentContext);
+    }
+
+    GrGLFuncPtr getProc(const char name[]) const {
+        return (GrGLFuncPtr) dlsym(fLoader.handle(), name);
+    }
+
+    void* getCurrentContext() const {
+        if (!fGetCurrentContext)
+            return nullptr;
+        return fGetCurrentContext();
+    }
+private:
+    GLLoader fLoader;
+    CGLGetCurrentContextProc fGetCurrentContext;
+};
+
+static GrGLFuncPtr mac_get_gl_proc(void* ctx, const char name[]) {
+    SkASSERT(ctx);
+    const GLProcGetter* getter = (const GLProcGetter*) ctx;
+    SkASSERT(getter->getCurrentContext());
+    return getter->getProc(name);
+}
 
 namespace GrGLInterfaces {
 sk_sp<const GrGLInterface> MakeMac() {
-    static const char kPath[] =
-        "/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib";
-    std::unique_ptr<void, SkFunctionObject<dlclose>> lib(dlopen(kPath, RTLD_LAZY));
-    return GrGLMakeAssembledGLInterface(lib.get(), [](void* ctx, const char* name) {
-            return (GrGLFuncPtr)dlsym(ctx ? ctx : RTLD_DEFAULT, name); });
+    GLProcGetter getter;
+    if (!getter.isInitialized())
+        return nullptr;
+    if (!getter.getCurrentContext())
+        return nullptr;
+    return GrGLMakeAssembledGLInterface(&getter, mac_get_gl_proc);
 }
 
 }  // namespace GrGLInterfaces

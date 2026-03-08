@@ -788,6 +788,7 @@ protected:
     static bool AnyStringMatching(FcPattern* font, FcPattern* pattern, const char* object) {
         auto getStrings = [](FcPattern* p, const char* object, STArray<32, FcChar8*>& strings) {
             // Set an arbitrary (but high) limit on the number of pattern object values to consider.
+            // Note: This high limit also covers Tizen fonts which can have up to 256 names.
             static constexpr const int maxId = 65536;
             for (int patternId = 0; patternId < maxId; ++patternId) {
                 FcChar8* patternString;
