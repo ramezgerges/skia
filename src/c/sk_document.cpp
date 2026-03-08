@@ -9,7 +9,9 @@
 
 #include "include/core/SkDocument.h"
 #include "include/docs/SkPDFDocument.h"
+#ifdef SK_BUILD_FOR_WIN
 #include "include/docs/SkXPSDocument.h"
+#endif
 
 #include "include/c/sk_document.h"
 
@@ -28,7 +30,11 @@ sk_document_t* sk_document_create_pdf_from_stream_with_metadata(sk_wstream_t* st
 }
 
 sk_document_t* sk_document_create_xps_from_stream(sk_wstream_t* stream, float dpi) {
+#ifdef SK_BUILD_FOR_WIN
     return ToDocument(SkXPS::MakeDocument(AsWStream(stream), dpi).release());
+#else
+    return nullptr;
+#endif
 }
 
 sk_canvas_t* sk_document_begin_page(sk_document_t* document, float width, float height, const sk_rect_t* content) {

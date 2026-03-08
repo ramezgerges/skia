@@ -27,12 +27,12 @@
 #include "src/core/SkMask.h"
 
 #if defined(SK_GANESH)
-#include "include/gpu/GrTypes.h"
-#include "include/gpu/GrContextOptions.h"
-#include "include/gpu/gl/GrGLTypes.h"
+#include "include/gpu/ganesh/GrTypes.h"
+#include "include/gpu/ganesh/GrContextOptions.h"
+#include "include/gpu/ganesh/gl/GrGLTypes.h"
 
 #if defined(SK_VULKAN)
-#include "include/gpu/vk/GrVkTypes.h"
+#include "include/gpu/ganesh/vk/GrVkTypes.h"
 #endif
 
 #endif
@@ -83,9 +83,9 @@ static_assert (sizeof (gr_gl_framebufferinfo_t) == sizeof (GrGLFramebufferInfo),
 static_assert (sizeof (gr_gl_textureinfo_t) == sizeof (GrGLTextureInfo), ASSERT_MSG(GrGLTextureInfo, gr_gl_textureinfo_t));
 
 #if defined(SK_VULKAN)
-static_assert (sizeof (gr_vk_alloc_t) == sizeof (GrVkAlloc), ASSERT_MSG(GrVkAlloc, gr_vk_alloc_t));
+static_assert (sizeof (gr_vk_alloc_t) == sizeof (skgpu::VulkanAlloc), ASSERT_MSG(skgpu::VulkanAlloc, gr_vk_alloc_t));
 static_assert (sizeof (gr_vk_imageinfo_t) == sizeof (GrVkImageInfo), ASSERT_MSG(GrVkImageInfo, gr_vk_imageinfo_t));
-static_assert (sizeof (gr_vk_ycbcrconversioninfo_t) == sizeof (GrVkYcbcrConversionInfo), ASSERT_MSG(GrVkYcbcrConversionInfo, gr_vk_ycbcrconversioninfo_t));
+static_assert (sizeof (gr_vk_ycbcrconversioninfo_t) == sizeof (skgpu::VulkanYcbcrConversionInfo), ASSERT_MSG(skgpu::VulkanYcbcrConversionInfo, gr_vk_ycbcrconversioninfo_t));
 #endif
 #endif
 
