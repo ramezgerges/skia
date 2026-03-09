@@ -116,7 +116,7 @@ public:
     static sk_sp<SkFontMgr> RefDefault();
 
     /** Construct a new instance of the fontmgr. */
-    static sk_sp<SkFontMgr> MakeDefault() { return SkFontMgr::Factory(); }
+    static sk_sp<SkFontMgr> MakeDefault() { return SkFontMgr::RefDefault(); }
 
 
     /* Returns an empty font manager without any typeface dependencies */

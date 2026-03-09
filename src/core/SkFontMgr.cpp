@@ -13,6 +13,19 @@
 #include "include/core/SkTypeface.h"
 #include "include/core/SkTypes.h"
 
+// Platform-specific font manager includes for RefDefault() implementation
+#if defined(SK_BUILD_FOR_ANDROID)
+#include "include/ports/SkFontMgr_android.h"
+#elif defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
+#include "include/ports/SkFontMgr_mac_ct.h"
+#elif defined(SK_BUILD_FOR_WIN)
+#include "include/ports/SkTypeface_win.h"
+#elif defined(SK_BUILD_FOR_UNIX)
+#include "include/ports/SkFontMgr_fontconfig.h"
+#else
+#include "include/ports/SkFontMgr_empty.h"
+#endif
+
 #include <utility>
 
 struct SkFontArguments;
@@ -153,6 +166,25 @@ sk_sp<SkTypeface> SkFontMgr::legacyMakeTypeface(const char familyName[], SkFontS
 
 sk_sp<SkFontMgr> SkFontMgr::RefEmpty() {
     static sk_sp<SkFontMgr> singleton(new SkEmptyFontMgr);
+    return singleton;
+}
+
+static sk_sp<SkFontMgr> create_platform_fontmgr() {
+#if defined(SK_BUILD_FOR_ANDROID)
+    return SkFontMgr_New_Android(nullptr);
+#elif defined(SK_BUILD_FOR_MAC) || defined(SK_BUILD_FOR_IOS)
+    return SkFontMgr_New_CoreText(nullptr);
+#elif defined(SK_BUILD_FOR_WIN)
+    return SkFontMgr_New_DirectWrite();
+#elif defined(SK_BUILD_FOR_UNIX)
+    return SkFontMgr_New_FontConfig(nullptr);
+#else
+    return SkFontMgr_New_Custom_Empty();
+#endif
+}
+
+sk_sp<SkFontMgr> SkFontMgr::RefDefault() {
+    static sk_sp<SkFontMgr> singleton = create_platform_fontmgr();
     return singleton;
 }
 

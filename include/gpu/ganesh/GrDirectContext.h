@@ -43,6 +43,8 @@ enum SkColorType : int;
 enum class SkTextureCompressionType;
 struct GrMockOptions;
 struct GrD3DBackendContext; // IWYU pragma: keep
+struct GrMtlBackendContext; // IWYU pragma: keep
+namespace skgpu { struct VulkanBackendContext; } // IWYU pragma: keep
 
 namespace skgpu {
     class MutableTextureState;
@@ -59,11 +61,19 @@ enum class BackendSurfaceAccess;
 
 class SK_API GrDirectContext : public GrRecordingContext {
 public:
+#ifdef SK_VULKAN
+    static sk_sp<GrDirectContext> MakeVulkan(const skgpu::VulkanBackendContext&);
+    static sk_sp<GrDirectContext> MakeVulkan(const skgpu::VulkanBackendContext&, const GrContextOptions&);
+#endif
+
+#ifdef SK_METAL
+    static sk_sp<GrDirectContext> MakeMetal(const GrMtlBackendContext&);
+    static sk_sp<GrDirectContext> MakeMetal(const GrMtlBackendContext&, const GrContextOptions&);
+    static sk_sp<GrDirectContext> MakeMetal(void* device, void* queue);
+    static sk_sp<GrDirectContext> MakeMetal(void* device, void* queue, const GrContextOptions&);
+#endif
+
 #ifdef SK_DIRECT3D
-    /**
-     * Makes a GrDirectContext which uses Direct3D as the backend. The Direct3D context
-     * must be kept alive until the returned GrDirectContext is first destroyed or abandoned.
-     */
     static sk_sp<GrDirectContext> MakeDirect3D(const GrD3DBackendContext&, const GrContextOptions&);
     static sk_sp<GrDirectContext> MakeDirect3D(const GrD3DBackendContext&);
 #endif

@@ -13,6 +13,8 @@
 #include "include/gpu/ganesh/gl/win/GrGLMakeWinInterface.h"
 #include "src/gpu/ganesh/gl/GrGLUtil.h"
 
+#include <windows.h>
+
 typedef HGLRC (WINAPI *WGLGetCurrentContextProc)(VOID);
 typedef PROC (WINAPI *WGLGetProcAddressProc)(LPCSTR name);
 

@@ -146,26 +146,36 @@ sk_sp<SkTypeface> SkTypeface::MakeEmpty() {
     return SkEmptyTypeface::Make();
 }
 
-SkFontStyle SkTypeface::FromOldStyle(Style oldStyle) {
-    return SkFontStyle((oldStyle & SkTypeface::kBold) ? SkFontStyle::kBold_Weight
-                                                      : SkFontStyle::kNormal_Weight,
-                       SkFontStyle::kNormal_Width,
-                       (oldStyle & SkTypeface::kItalic) ? SkFontStyle::kItalic_Slant
-                                                        : SkFontStyle::kUpright_Slant);
-}
+// Legacy SkiaSharp compatibility shims for removed Style enum
+namespace {
+    enum LegacyStyle {
+        kNormal = 0,
+        kBold   = 0x01,
+        kItalic = 0x02,
+        kBoldItalic = 0x03,
+    };
 
-SkTypeface* SkTypeface::GetDefaultTypeface(Style style) {
-    static SkOnce once[4];
-    static sk_sp<SkTypeface> defaults[4];
+    SkFontStyle FromOldStyle(int oldStyle) {
+        return SkFontStyle((oldStyle & kBold) ? SkFontStyle::kBold_Weight
+                                              : SkFontStyle::kNormal_Weight,
+                           SkFontStyle::kNormal_Width,
+                           (oldStyle & kItalic) ? SkFontStyle::kItalic_Slant
+                                                : SkFontStyle::kUpright_Slant);
+    }
 
-    SkASSERT((int)style < 4);
-    once[style]([style] {
-        sk_sp<SkFontMgr> fm(SkFontMgr::RefDefault());
-        auto t = fm->legacyMakeTypeface(nullptr, FromOldStyle(style));
-        defaults[style] = t ? t : SkEmptyTypeface::Make();
-    });
-    return defaults[style].get();
-}
+    SkTypeface* GetDefaultTypeface(int style = 0) {
+        static SkOnce once[4];
+        static sk_sp<SkTypeface> defaults[4];
+
+        SkASSERT(style < 4);
+        once[style]([style] {
+            sk_sp<SkFontMgr> fm(SkFontMgr::RefDefault());
+            auto t = fm->legacyMakeTypeface(nullptr, FromOldStyle(style));
+            defaults[style] = t ? t : SkEmptyTypeface::Make();
+        });
+        return defaults[style].get();
+    }
+}  // namespace
 
 sk_sp<SkTypeface> SkTypeface::MakeDefault() {
     return sk_ref_sp(GetDefaultTypeface());
@@ -182,7 +192,7 @@ sk_sp<SkTypeface> SkTypeface::RefDefault() {
     return singleton;
 }
 
-uint32_t SkTypeface::UniqueID(const SkTypeface* face) {
+uint32_t SkTypeface_UniqueID(const SkTypeface* face) {
     if (nullptr == face) {
         face = GetDefaultTypeface();
     }
@@ -236,11 +246,9 @@ sk_sp<SkTypeface> SkTypeface::MakeFromName(const char name[],
                             fontStyle.slant() == SkFontStyle::kUpright_Slant) &&
                            (fontStyle.weight() == SkFontStyle::kBold_Weight ||
                             fontStyle.weight() == SkFontStyle::kNormal_Weight)) {
-        return sk_ref_sp(GetDefaultTypeface(static_cast<SkTypeface::Style>(
-            (fontStyle.slant() == SkFontStyle::kItalic_Slant ? SkTypeface::kItalic :
-                                                               SkTypeface::kNormal) |
-            (fontStyle.weight() == SkFontStyle::kBold_Weight ? SkTypeface::kBold :
-                                                               SkTypeface::kNormal))));
+        return sk_ref_sp(GetDefaultTypeface(
+            (fontStyle.slant() == SkFontStyle::kItalic_Slant ? kItalic : kNormal) |
+            (fontStyle.weight() == SkFontStyle::kBold_Weight ? kBold : kNormal)));
     }
     return SkFontMgr::RefDefault()->legacyMakeTypeface(name, fontStyle);
 }

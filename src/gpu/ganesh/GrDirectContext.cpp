@@ -52,6 +52,10 @@
 #include "src/gpu/ganesh/SurfaceContext.h"
 #include "src/gpu/ganesh/image/SkImage_GaneshBase.h"
 #include "src/gpu/ganesh/mock/GrMockGpu.h"
+#ifdef SK_VULKAN
+#include "include/gpu/ganesh/vk/GrVkDirectContext.h"
+#include "include/gpu/vk/VulkanBackendContext.h"
+#endif
 #include "src/gpu/ganesh/ops/SmallPathAtlasMgr.h"
 #include "src/gpu/ganesh/surface/SkSurface_Ganesh.h"
 #include "src/gpu/ganesh/text/GrAtlasManager.h"
@@ -1185,58 +1189,40 @@ sk_sp<GrDirectContext> GrDirectContext::MakeMock(const GrMockOptions* mockOption
 
 #ifdef SK_VULKAN
 /*************************************************************************************************/
-sk_sp<GrDirectContext> GrDirectContext::MakeVulkan(const GrVkBackendContext& backendContext) {
-    GrContextOptions defaultOptions;
-    return MakeVulkan(backendContext, defaultOptions);
+sk_sp<GrDirectContext> GrDirectContext::MakeVulkan(const skgpu::VulkanBackendContext& backendContext) {
+    return GrDirectContexts::MakeVulkan(backendContext);
 }
 
-sk_sp<GrDirectContext> GrDirectContext::MakeVulkan(const GrVkBackendContext& backendContext,
+sk_sp<GrDirectContext> GrDirectContext::MakeVulkan(const skgpu::VulkanBackendContext& backendContext,
                                                    const GrContextOptions& options) {
-    sk_sp<GrDirectContext> direct(new GrDirectContext(GrBackendApi::kVulkan, options));
-
-    direct->fGpu = GrVkGpu::Make(backendContext, options, direct.get());
-    if (!direct->init()) {
-        return nullptr;
-    }
-
-    return direct;
+    return GrDirectContexts::MakeVulkan(backendContext, options);
 }
 #endif
 
 #ifdef SK_METAL
 /*************************************************************************************************/
 sk_sp<GrDirectContext> GrDirectContext::MakeMetal(const GrMtlBackendContext& backendContext) {
-    GrContextOptions defaultOptions;
-    return MakeMetal(backendContext, defaultOptions);
+    return GrDirectContexts::MakeMetal(backendContext);
 }
 
 sk_sp<GrDirectContext> GrDirectContext::MakeMetal(const GrMtlBackendContext& backendContext,
                                                      const GrContextOptions& options) {
-    sk_sp<GrDirectContext> direct(new GrDirectContext(GrBackendApi::kMetal, options));
-
-    direct->fGpu = GrMtlTrampoline::MakeGpu(backendContext, options, direct.get());
-    if (!direct->init()) {
-        return nullptr;
-    }
-
-    return direct;
+    return GrDirectContexts::MakeMetal(backendContext, options);
 }
 
-// deprecated
 sk_sp<GrDirectContext> GrDirectContext::MakeMetal(void* device, void* queue) {
-    GrContextOptions defaultOptions;
-    return MakeMetal(device, queue, defaultOptions);
+    GrMtlBackendContext backendContext = {};
+    backendContext.fDevice.retain(device);
+    backendContext.fQueue.retain(queue);
+    return GrDirectContexts::MakeMetal(backendContext);
 }
 
-// deprecated
-// remove include/gpu/mtl/GrMtlBackendContext.h, above, when removed
 sk_sp<GrDirectContext> GrDirectContext::MakeMetal(void* device, void* queue,
                                                   const GrContextOptions& options) {
     GrMtlBackendContext backendContext = {};
     backendContext.fDevice.retain(device);
     backendContext.fQueue.retain(queue);
-
-    return GrDirectContext::MakeMetal(backendContext, options);
+    return GrDirectContexts::MakeMetal(backendContext, options);
 }
 #endif
 
