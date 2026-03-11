@@ -109,38 +109,6 @@ public:
     /** Returns a non-null typeface which contains no glyphs. */
     static sk_sp<SkTypeface> MakeEmpty();
 
-    /** Returns the default normal typeface, which is never nullptr. */
-    static sk_sp<SkTypeface> MakeDefault();
-
-    static sk_sp<SkTypeface> RefDefault();
-
-    /** Creates a new reference to the typeface that most closely matches the
-        requested familyName and fontStyle. This method allows extended font
-        face specifiers as in the SkFontStyle type. Will never return null.
-
-        @param familyName  May be NULL. The name of the font family.
-        @param fontStyle   The style of the typeface.
-        @return reference to the closest-matching typeface. Call must call
-              unref() when they are done.
-    */
-    static sk_sp<SkTypeface> MakeFromName(const char familyName[], SkFontStyle fontStyle);
-
-    /** Return a new typeface given a file. If the file does not exist, or is
-        not a valid font file, returns nullptr.
-    */
-    static sk_sp<SkTypeface> MakeFromFile(const char path[], int index = 0);
-
-    /** Return a new typeface given a stream. If the stream is
-        not a valid font file, returns nullptr. Ownership of the stream is
-        transferred, so the caller must not reference it again.
-    */
-    static sk_sp<SkTypeface> MakeFromStream(std::unique_ptr<SkStreamAsset> stream, int index = 0);
-
-    /** Return a new typeface given a SkData. If the data is null, or is not a valid font file,
-     *  returns nullptr.
-     */
-    static sk_sp<SkTypeface> MakeFromData(sk_sp<SkData>, int index = 0);
-
     /** Return a new typeface based on this typeface but parameterized as specified in the
         SkFontArguments. If the SkFontArguments does not supply an argument for a parameter
         in the font then the value from this typeface will be used as the value for that

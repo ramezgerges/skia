@@ -146,59 +146,6 @@ sk_sp<SkTypeface> SkTypeface::MakeEmpty() {
     return SkEmptyTypeface::Make();
 }
 
-// Legacy SkiaSharp compatibility shims for removed Style enum
-namespace {
-    enum LegacyStyle {
-        kNormal = 0,
-        kBold   = 0x01,
-        kItalic = 0x02,
-        kBoldItalic = 0x03,
-    };
-
-    SkFontStyle FromOldStyle(int oldStyle) {
-        return SkFontStyle((oldStyle & kBold) ? SkFontStyle::kBold_Weight
-                                              : SkFontStyle::kNormal_Weight,
-                           SkFontStyle::kNormal_Width,
-                           (oldStyle & kItalic) ? SkFontStyle::kItalic_Slant
-                                                : SkFontStyle::kUpright_Slant);
-    }
-
-    SkTypeface* GetDefaultTypeface(int style = 0) {
-        static SkOnce once[4];
-        static sk_sp<SkTypeface> defaults[4];
-
-        SkASSERT(style < 4);
-        once[style]([style] {
-            sk_sp<SkFontMgr> fm(SkFontMgr::RefDefault());
-            auto t = fm->legacyMakeTypeface(nullptr, FromOldStyle(style));
-            defaults[style] = t ? t : SkEmptyTypeface::Make();
-        });
-        return defaults[style].get();
-    }
-}  // namespace
-
-sk_sp<SkTypeface> SkTypeface::MakeDefault() {
-    return sk_ref_sp(GetDefaultTypeface());
-}
-
-sk_sp<SkTypeface> SkTypeface::RefDefault() {
-    static SkOnce once;
-    static sk_sp<SkTypeface> singleton;
-
-    once([]{
-        SkTypeface* tf = GetDefaultTypeface();
-        singleton = sk_ref_sp(tf);
-    });
-    return singleton;
-}
-
-uint32_t SkTypeface_UniqueID(const SkTypeface* face) {
-    if (nullptr == face) {
-        face = GetDefaultTypeface();
-    }
-    return face->uniqueID();
-}
-
 bool SkTypeface::Equal(const SkTypeface* facea, const SkTypeface* faceb) {
     if (facea == faceb) {
         return true;
@@ -239,37 +186,6 @@ namespace {
     }
 
 }  // namespace
-
-sk_sp<SkTypeface> SkTypeface::MakeFromName(const char name[],
-                                           SkFontStyle fontStyle) {
-    if (nullptr == name && (fontStyle.slant() == SkFontStyle::kItalic_Slant ||
-                            fontStyle.slant() == SkFontStyle::kUpright_Slant) &&
-                           (fontStyle.weight() == SkFontStyle::kBold_Weight ||
-                            fontStyle.weight() == SkFontStyle::kNormal_Weight)) {
-        return sk_ref_sp(GetDefaultTypeface(
-            (fontStyle.slant() == SkFontStyle::kItalic_Slant ? kItalic : kNormal) |
-            (fontStyle.weight() == SkFontStyle::kBold_Weight ? kBold : kNormal)));
-    }
-    return SkFontMgr::RefDefault()->legacyMakeTypeface(name, fontStyle);
-}
-
-sk_sp<SkTypeface> SkTypeface::MakeFromStream(std::unique_ptr<SkStreamAsset> stream, int index) {
-    if (!stream) {
-        return nullptr;
-    }
-    return SkFontMgr::RefDefault()->makeFromStream(std::move(stream), index);
-}
-
-sk_sp<SkTypeface> SkTypeface::MakeFromData(sk_sp<SkData> data, int index) {
-    if (!data) {
-        return nullptr;
-    }
-    return SkFontMgr::RefDefault()->makeFromData(std::move(data), index);
-}
-
-sk_sp<SkTypeface> SkTypeface::MakeFromFile(const char path[], int index) {
-    return SkFontMgr::RefDefault()->makeFromFile(path, index);
-}
 
 sk_sp<SkTypeface> SkTypeface::makeClone(const SkFontArguments& args) const {
     return this->onMakeClone(args);
