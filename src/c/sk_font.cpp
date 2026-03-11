@@ -146,9 +146,7 @@ void sk_font_measure_text_no_return(const sk_font_t* font, const void* text, siz
 }
 
 size_t sk_font_break_text(const sk_font_t* font, const void* text, size_t byteLength, sk_text_encoding_t encoding, float maxWidth, float* measuredWidth, const sk_paint_t* paint) {
-    // breakText() was removed in Skia m132
-    if (measuredWidth) *measuredWidth = 0.0f;
-    return 0;
+    return AsFont(font)->breakText(text, byteLength, (SkTextEncoding)encoding, maxWidth, measuredWidth, AsPaint(paint));
 }
 
 void sk_font_get_widths_bounds(const sk_font_t* font, const uint16_t glyphs[], int count, float widths[], sk_rect_t bounds[], const sk_paint_t* paint) {
