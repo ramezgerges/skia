@@ -51,7 +51,7 @@ SkM44& SkM44::setConcat(const SkM44& a, const SkM44& b) {
     auto c2 = skvx::float4::Load(a.fMat +  8);
     auto c3 = skvx::float4::Load(a.fMat + 12);
 
-    auto compute = [&](const skvx::float4 r) {
+    auto compute = [&](skvx::float4 r) {
         return c0*r[0] + (c1*r[1] + (c2*r[2] + c3*r[3]));
     };
 
