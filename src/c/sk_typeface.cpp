@@ -52,6 +52,11 @@ static sk_sp<SkFontMgr> get_default_fontmgr() {
     return mgr;
 }
 
+// Exposed for use by other C API files (e.g., sk_font.cpp)
+sk_sp<SkFontMgr> sk_get_default_fontmgr() {
+    return get_default_fontmgr();
+}
+
 // typeface
 
 void sk_typeface_unref(sk_typeface_t* typeface) {

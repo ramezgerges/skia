@@ -8,6 +8,8 @@
  */
 
 #include "include/core/SkFont.h"
+#include "include/core/SkFontMgr.h"
+#include "include/core/SkFontStyle.h"
 #include "include/core/SkTypeface.h"
 #include "include/utils/SkTextUtils.h"
 
@@ -15,14 +17,21 @@
 
 #include "src/c/sk_types_priv.h"
 
+// Forward declaration from sk_typeface.cpp
+extern sk_sp<SkFontMgr> sk_get_default_fontmgr();
+
 // sk_font_t
 
 sk_font_t* sk_font_new(void) {
-    return ToFont(new SkFont());
+    auto tf = sk_get_default_fontmgr()->legacyMakeTypeface("", SkFontStyle::Normal());
+    return ToFont(new SkFont(std::move(tf)));
 }
 
 sk_font_t* sk_font_new_with_values(sk_typeface_t* typeface, float size, float scaleX, float skewX) {
-    return ToFont(new SkFont(sk_ref_sp(AsTypeface(typeface)), size, scaleX, skewX));
+    sk_sp<SkTypeface> tf = typeface
+        ? sk_ref_sp(AsTypeface(typeface))
+        : sk_get_default_fontmgr()->legacyMakeTypeface("", SkFontStyle::Normal());
+    return ToFont(new SkFont(std::move(tf), size, scaleX, skewX));
 }
 
 void sk_font_delete(sk_font_t* font) {

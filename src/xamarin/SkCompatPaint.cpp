@@ -6,13 +6,22 @@
  * found in the LICENSE file.
  */
 
+#include "include/core/SkFontMgr.h"
+#include "include/core/SkFontStyle.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkFont.h"
 #include "include/utils/SkTextUtils.h"
 #include "include/xamarin/SkCompatPaint.h"
 
+// Forward declaration from sk_typeface.cpp
+extern sk_sp<SkFontMgr> sk_get_default_fontmgr();
+
+static sk_sp<SkTypeface> get_default_typeface() {
+    return sk_get_default_fontmgr()->legacyMakeTypeface("", SkFontStyle::Normal());
+}
+
 SkCompatPaint::SkCompatPaint()
-    : fFont(SkFont())
+    : fFont(SkFont(get_default_typeface()))
     , fTextAlign(SkTextUtils::Align::kLeft_Align)
     , fTextEncoding(SkTextEncoding::kUTF8)
     , fFilterQuality(SkFilterQuality::None)
