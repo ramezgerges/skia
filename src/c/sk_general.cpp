@@ -26,8 +26,7 @@ bool sk_refcnt_unique(const sk_refcnt_t* refcnt) {
     return AsRefCnt(refcnt)->unique();
 }
 int sk_refcnt_get_ref_count(const sk_refcnt_t* refcnt) {
-    // getRefCount() was removed from public API in Skia m132
-    return -1;
+    return AsRefCnt(refcnt)->getRefCount();
 }
 void sk_refcnt_safe_ref(sk_refcnt_t* refcnt) {
     SkSafeRef(AsRefCnt(refcnt));
@@ -40,8 +39,7 @@ bool sk_nvrefcnt_unique(const sk_nvrefcnt_t* refcnt) {
     return AsNVRefCnt(refcnt)->unique();
 }
 int sk_nvrefcnt_get_ref_count(const sk_nvrefcnt_t* refcnt) {
-    // getRefCount() was removed from public API in Skia m132
-    return -1;
+    return AsNVRefCnt(refcnt)->getRefCount();
 }
 void sk_nvrefcnt_safe_ref(sk_nvrefcnt_t* refcnt) {
     SkSafeRef(AsNVRefCnt(refcnt));
