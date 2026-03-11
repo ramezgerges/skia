@@ -37,6 +37,8 @@
 #        define SK_ONLY_VULKAN(...) SK_SKIP_ARG(__VA_ARGS__)
 #    endif
 #    if SK_METAL
+#        include "include/gpu/ganesh/mtl/GrMtlTypes.h"
+#        include "include/gpu/ganesh/mtl/GrMtlBackendSurface.h"
 #        define SK_ONLY_METAL(...) SK_FIRST_ARG(__VA_ARGS__)
 #    else
 #        define SK_ONLY_METAL(...) SK_SKIP_ARG(__VA_ARGS__)

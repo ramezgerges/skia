@@ -257,7 +257,7 @@ gr_backendtexture_t* gr_backendtexture_new_vulkan(int width, int height, const g
 }
 
 gr_backendtexture_t* gr_backendtexture_new_metal(int width, int height, bool mipmapped, const gr_mtl_textureinfo_t* mtlInfo) {
-    return SK_ONLY_METAL(ToGrBackendTexture(new GrBackendTexture(width, height, (skgpu::Mipmapped)mipmapped, AsGrMtlTextureInfo(mtlInfo))), nullptr);
+    return SK_ONLY_METAL(ToGrBackendTexture(new GrBackendTexture(GrBackendTextures::MakeMtl(width, height, (skgpu::Mipmapped)mipmapped, AsGrMtlTextureInfo(mtlInfo)))), nullptr);
 }
 
 gr_backendtexture_t* gr_backendtexture_new_direct3d(int width, int height, const gr_d3d_textureresourceinfo_t* d3dInfo) {
@@ -304,7 +304,7 @@ gr_backendrendertarget_t* gr_backendrendertarget_new_vulkan(int width, int heigh
 }
 
 gr_backendrendertarget_t* gr_backendrendertarget_new_metal(int width, int height, const gr_mtl_textureinfo_t* mtlInfo) {
-    return SK_ONLY_METAL(ToGrBackendRenderTarget(new GrBackendRenderTarget(width, height, AsGrMtlTextureInfo(mtlInfo))), nullptr);
+    return SK_ONLY_METAL(ToGrBackendRenderTarget(new GrBackendRenderTarget(GrBackendRenderTargets::MakeMtl(width, height, AsGrMtlTextureInfo(mtlInfo)))), nullptr);
 }
 
 gr_backendrendertarget_t* gr_backendrendertarget_new_direct3d(int width, int height, const gr_d3d_textureresourceinfo_t* d3dInfo) {
