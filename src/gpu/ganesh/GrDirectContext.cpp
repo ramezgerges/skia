@@ -52,14 +52,6 @@
 #include "src/gpu/ganesh/SurfaceContext.h"
 #include "src/gpu/ganesh/image/SkImage_GaneshBase.h"
 #include "src/gpu/ganesh/mock/GrMockGpu.h"
-#ifdef SK_VULKAN
-#include "include/gpu/ganesh/vk/GrVkDirectContext.h"
-#include "include/gpu/vk/VulkanBackendContext.h"
-#endif
-#ifdef SK_METAL
-#include "include/gpu/ganesh/mtl/GrMtlBackendContext.h"
-#include "include/gpu/ganesh/mtl/GrMtlDirectContext.h"
-#endif
 #include "src/gpu/ganesh/ops/SmallPathAtlasMgr.h"
 #include "src/gpu/ganesh/surface/SkSurface_Ganesh.h"
 #include "src/gpu/ganesh/text/GrAtlasManager.h"
@@ -1190,46 +1182,6 @@ sk_sp<GrDirectContext> GrDirectContext::MakeMock(const GrMockOptions* mockOption
 
     return direct;
 }
-
-#ifdef SK_VULKAN
-/*************************************************************************************************/
-sk_sp<GrDirectContext> GrDirectContext::MakeVulkan(const skgpu::VulkanBackendContext& backendContext) {
-    return GrDirectContexts::MakeVulkan(backendContext);
-}
-
-sk_sp<GrDirectContext> GrDirectContext::MakeVulkan(const skgpu::VulkanBackendContext& backendContext,
-                                                   const GrContextOptions& options) {
-    return GrDirectContexts::MakeVulkan(backendContext, options);
-}
-#endif
-
-#ifdef SK_METAL
-/*************************************************************************************************/
-sk_sp<GrDirectContext> GrDirectContext::MakeMetal(const GrMtlBackendContext& backendContext) {
-    return GrDirectContexts::MakeMetal(backendContext);
-}
-
-sk_sp<GrDirectContext> GrDirectContext::MakeMetal(const GrMtlBackendContext& backendContext,
-                                                     const GrContextOptions& options) {
-    return GrDirectContexts::MakeMetal(backendContext, options);
-}
-
-sk_sp<GrDirectContext> GrDirectContext::MakeMetal(void* device, void* queue) {
-    GrMtlBackendContext backendContext = {};
-    backendContext.fDevice.retain(device);
-    backendContext.fQueue.retain(queue);
-    return GrDirectContexts::MakeMetal(backendContext);
-}
-
-sk_sp<GrDirectContext> GrDirectContext::MakeMetal(void* device, void* queue,
-                                                  const GrContextOptions& options) {
-    GrMtlBackendContext backendContext = {};
-    backendContext.fDevice.retain(device);
-    backendContext.fQueue.retain(queue);
-    return GrDirectContexts::MakeMetal(backendContext, options);
-}
-#endif
-
 
 #ifdef SK_DIRECT3D
 /*************************************************************************************************/
