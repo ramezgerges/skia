@@ -57,6 +57,15 @@
 #    define SK_ONLY_DIRECT3D(...) SK_SKIP_ARG(__VA_ARGS__)
 #endif // SK_GANESH
 
+#if defined(SK_GRAPHITE)
+#    include "include/gpu/graphite/Context.h"
+#    include "include/gpu/graphite/Recorder.h"
+#    include "include/gpu/graphite/Recording.h"
+#    define SK_ONLY_GRAPHITE(...) SK_FIRST_ARG(__VA_ARGS__)
+#else
+#    define SK_ONLY_GRAPHITE(...) SK_SKIP_ARG(__VA_ARGS__)
+#endif
+
 
 // Define a mapping between a C++ type and the C type.
 //
@@ -163,6 +172,28 @@ DEF_CLASS_MAP(GrDirectContext, gr_direct_context_t, GrDirectContext)
 DEF_CLASS_MAP(GrRecordingContext, gr_recording_context_t, GrRecordingContext)
 DEF_CLASS_MAP(GrBackendTexture, gr_backendtexture_t, GrBackendTexture)
 DEF_CLASS_MAP(GrBackendRenderTarget, gr_backendrendertarget_t, GrBackendRenderTarget)
+
+// Graphite type mappings (manual due to nested namespace)
+#if defined(SK_GRAPHITE)
+static inline skgpu::graphite::Context* AsGraphiteContext(graphite_context_t* t) {
+    return reinterpret_cast<skgpu::graphite::Context*>(t);
+}
+static inline graphite_context_t* ToGraphiteContext(skgpu::graphite::Context* t) {
+    return reinterpret_cast<graphite_context_t*>(t);
+}
+static inline skgpu::graphite::Recorder* AsGraphiteRecorder(graphite_recorder_t* t) {
+    return reinterpret_cast<skgpu::graphite::Recorder*>(t);
+}
+static inline graphite_recorder_t* ToGraphiteRecorder(skgpu::graphite::Recorder* t) {
+    return reinterpret_cast<graphite_recorder_t*>(t);
+}
+static inline skgpu::graphite::Recording* AsGraphiteRecording(graphite_recording_t* t) {
+    return reinterpret_cast<skgpu::graphite::Recording*>(t);
+}
+static inline graphite_recording_t* ToGraphiteRecording(skgpu::graphite::Recording* t) {
+    return reinterpret_cast<graphite_recording_t*>(t);
+}
+#endif // SK_GRAPHITE
 
 DEF_STRUCT_MAP(skcms_ICCProfile, sk_colorspace_icc_profile_t, ColorSpaceIccProfile)
 DEF_STRUCT_MAP(SkColorSpacePrimaries, sk_colorspace_primaries_t, ColorSpacePrimaries)

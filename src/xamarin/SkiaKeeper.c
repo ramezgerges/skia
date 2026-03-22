@@ -44,6 +44,9 @@
 #include "include/c/sk_typeface.h"
 #include "include/c/sk_vertices.h"
 
+// Graphite
+#include "include/c/graphite_context.h"
+
 // Skottie
 #include "include/c/skottie_animation.h"
 #include "include/c/sksg_invalidation_controller.h"
@@ -110,6 +113,14 @@ void** KeepSkiaCSymbols (void)
 
         // Linker
         (void*)sk_linker_keep_alive,
+
+        // Graphite
+        (void*)graphite_context_make_vulkan,
+        (void*)graphite_context_unref,
+        (void*)graphite_context_make_recorder,
+        (void*)graphite_recorder_snap,
+        (void*)graphite_recorder_unref,
+        (void*)graphite_recording_unref,
     };
     return ret;
 }

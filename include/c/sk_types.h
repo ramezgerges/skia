@@ -639,6 +639,17 @@ typedef struct gr_backendtexture_t gr_backendtexture_t;
 typedef struct gr_direct_context_t gr_direct_context_t;
 typedef struct gr_recording_context_t gr_recording_context_t;
 
+// Graphite types
+typedef struct graphite_context_t graphite_context_t;
+typedef struct graphite_recorder_t graphite_recorder_t;
+typedef struct graphite_recording_t graphite_recording_t;
+
+typedef struct {
+    size_t fGpuBudgetInBytes;
+    int fInternalMultisampleCount;
+    bool fDisableDriverCorrectnessWorkarounds;
+} graphite_context_options_t;
+
 typedef enum {
     OPENGL_GR_BACKEND      = 0,
     VULKAN_GR_BACKEND      = 1,
